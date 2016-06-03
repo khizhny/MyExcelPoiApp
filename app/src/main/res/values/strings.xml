@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Tracker</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="str_rb_normal">Normal</string>
+    <string name="str_rb_satellite">Satellite</string>
+    <string name="str_rb_terrain">Terrain</string>
+    <string name="title_activity_layers">LayersActivity</string>
+    <string name="delete">delete</string>
+    <string name="icon">icon</string>
+    <string name="layers">Layers</string>
+    <string name="maps">maps</string>
+    <string name="icon2">icon</string>
+    <string name="label">Label</string>
+    <string name="description">Description</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="layer">Layer:</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+</resources>
