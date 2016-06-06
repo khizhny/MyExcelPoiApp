@@ -1,5 +1,7 @@
 package com.khizhny.tracker;
 
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,30 +24,36 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
     private ArrayList<MyLayer> layers;
     private Spinner layerSpinner;
     private MyItem point;
+    private TextView latView;
+    private TextView lonView;
+    private Boolean useGmsFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_point);
-        TextView latView = (TextView) findViewById(R.id.new_point_lat);
-        TextView lonView = (TextView) findViewById(R.id.new_point_lon);
+        latView = (TextView) findViewById(R.id.new_point_lat);
+        lonView = (TextView) findViewById(R.id.new_point_lon);
         EditText descriptionView = (EditText) findViewById(R.id.new_point_description);
         EditText labelView = (EditText) findViewById(R.id.new_point_label);
+        SharedPreferences sp = getApplication().getSharedPreferences("settings",0);
+        useGmsFormat=sp.getBoolean("useGmsFormat",true);
 
         layerSpinner = (Spinner)  findViewById(R.id.new_point_layer);
         // reading all layers from db to fill spinner
         DB db = DB.getInstance(getApplicationContext());
         db.open();
         layers= db.getLayers(null,false,true);
-        db.close();
-        if (layers.size()>0) {
-            ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, layers);
-            layerSpinner.setAdapter(spinnerArrayAdapter);
-            layerSpinner.setSelection(0);
-        } else {
-            Toast.makeText(this,"No layers found :(", Toast.LENGTH_SHORT).show();
-            this.finish();
+        if (layers.size()==0) {
+            float[] randomHsv= {(float) (360*Math.random()),1,1};
+            db.saveLayer(new MyLayer(0, "My layer", 0, Color.HSVToColor(randomHsv), true, this));
+            layers= db.getLayers(null,false,true);
         }
+        ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(this,android.R.layout.simple_spinner_item, layers);
+        layerSpinner.setAdapter(spinnerArrayAdapter);
+        layerSpinner.setSelection(0);
+
+        db.close();
         // spinner change handler
         layerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -91,10 +99,12 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
         }
 
         if (latView != null) {
-            latView.setText(point.getLatitude());
+            latView.setText(point.getLatitude(true));
+            latView.setOnClickListener(this);
         }
         if (lonView != null) {
-            lonView.setText(point.getLongitude());
+            lonView.setText(point.getLongitude(true));
+            lonView.setOnClickListener(this);
         }
 
         Button saveButton = (Button) findViewById(R.id.new_point_save);
@@ -105,6 +115,11 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
         Button cancelButton = (Button) findViewById(R.id.new_point_cancel);
         if (cancelButton != null) {
             cancelButton.setOnClickListener(this);
+        }
+
+        Button backCancelButton = (Button) findViewById(R.id.new_point_back_cancel);
+        if (backCancelButton != null) {
+            backCancelButton.setOnClickListener(this);
         }
 
         ImageButton deleteButton = (ImageButton) findViewById(R.id.new_point_delete);
@@ -121,6 +136,7 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
         MyLayer layer;
         String comment,label;
         switch (v.getId()){
+            case R.id.new_point_back_cancel:
             case R.id.new_point_cancel:
                 this.finish();
                 break;
@@ -146,6 +162,15 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
                 }
                 MainActivity.isRefreshNeeded=true;
                 this.finish();
+                break;
+            case R.id.new_point_lat:
+            case R.id.new_point_lon:
+                useGmsFormat=!useGmsFormat;
+                latView.setText(point.getLatitude(useGmsFormat));
+                lonView.setText(point.getLatitude(useGmsFormat));
+                SharedPreferences.Editor spe = getApplication().getSharedPreferences("settings",0).edit();
+                spe.putBoolean("useGmsFormat",useGmsFormat);
+                spe.commit();
                 break;
         }
     }

@@ -97,7 +97,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onCameraChange(CameraPosition cameraPosition) {
         // reloading data if camera moved out of loaded area
         cameraBounds = map.getProjection().getVisibleRegion().latLngBounds;
-        if (Math.abs(prevZoomLevel-map.getCameraPosition().zoom) >= 1 || isRefreshNeeded){
+        if (Math.abs(prevZoomLevel-map.getCameraPosition().zoom) >= 2 || isRefreshNeeded){
             // if zoom changed a lot reloading data to free up memory from invisible markers.
             prevZoomLevel=map.getCameraPosition().zoom;
             loadedBounds=fetchData(cameraBounds);
@@ -335,8 +335,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         i = i + 1;
                         pointsSheet.addCell(new Label(0, i, "" + i));
                         pointsSheet.addCell(new Label(1, i, p.getLabel()));
-                        pointsSheet.addCell(new Label(2, i, p.getLongitude()));
-                        pointsSheet.addCell(new Label(3, i, p.getLatitude()));
+                        pointsSheet.addCell(new Label(2, i, p.getLongitude(false)));
+                        pointsSheet.addCell(new Label(3, i, p.getLatitude(false)));
                         pointsSheet.addCell(new Label(4, i, p.getComment()));
                         pointsSheet.addCell(new Label(5, i, l.getId() + ""));
                     }

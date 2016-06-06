@@ -4,6 +4,11 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 public class MyItem implements ClusterItem {
     private final LatLng position;
     private final String comment;
@@ -11,6 +16,7 @@ public class MyItem implements ClusterItem {
     private final MyLayer layer;
     private final int layerId;
     private int id;
+    private static DecimalFormat df = new DecimalFormat("#.######");
 
     /**
      * Constructs new point with linking to layer object
@@ -62,12 +68,33 @@ public class MyItem implements ClusterItem {
         return label;
     }
 
-    public String getLongitude() {
-        return (position.longitude+"").substring(0,8);
+    public String getLongitude(boolean inGmsFormat) {
+        if (inGmsFormat) {
+            return convertToGms(position.longitude);
+        }else {
+            df.setRoundingMode(RoundingMode.CEILING);
+            return df.format(position.longitude);
+        }
     }
 
-    public String getLatitude() {
-        return (position.latitude+"").substring(0,8);
+    private String convertToGms(double d){
+        double temp = d;
+        MathContext getInt=  new MathContext(0,RoundingMode.FLOOR);
+        BigDecimal gg = (new BigDecimal(temp,getInt)).setScale(0, RoundingMode.FLOOR);
+        temp = (temp - gg.doubleValue()) * 60d;
+        BigDecimal mm = new BigDecimal(temp,getInt).setScale(0, RoundingMode.FLOOR);
+        temp = (temp - mm.doubleValue()) * 60d;
+        BigDecimal ss = new BigDecimal(temp,getInt).setScale(1, RoundingMode.HALF_UP);
+        return gg.toString()+((char)0x02DA)+" "+mm.toString()+"' "+ss.toString()+((char)0x0022);
+    }
+
+    public String getLatitude(boolean inGmsFormat) {
+        if (inGmsFormat) {
+            return convertToGms(position.latitude);
+        }else {
+            df.setRoundingMode(RoundingMode.CEILING);
+            return df.format(position.latitude);
+        }
     }
 
     public BitmapDescriptor getIcon() {

@@ -17,9 +17,18 @@
         android:id="@+id/textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:gravity="center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
         android:textSize="25dp"
-        android:textColor="#e6ff00"/>
+        android:textColor="#e6ff00"
+        android:layout_alignBottom="@+id/addNewLayer"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/addNewLayer"
+        android:src="@android:drawable/ic_menu_add"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
     <ListView
         android:layout_width="fill_parent"

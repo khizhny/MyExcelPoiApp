@@ -12,8 +12,8 @@
     <string name="icon2">icon</string>
     <string name="label">Label</string>
     <string name="description">Description</string>
-    <string name="latitude">Latitude:</string>
-    <string name="longitude">Longitude:</string>
+    <string name="latitude">Lat:</string>
+    <string name="longitude">Lon:</string>
     <string name="layer">Layer:</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>

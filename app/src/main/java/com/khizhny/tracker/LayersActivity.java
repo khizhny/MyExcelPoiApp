@@ -2,6 +2,7 @@ package com.khizhny.tracker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import static com.khizhny.tracker.MainActivity.TAG;
@@ -21,6 +23,7 @@ import java.util.List;
 public class LayersActivity extends AppCompatActivity {
     private List<MyLayer> layers;
     private boolean changedByUser;
+    private LayerListAdapter layerListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,13 +38,28 @@ public class LayersActivity extends AppCompatActivity {
         db.open();
         layers = db.getLayers(null, false, true);
         db.close();
-        LayerListAdapter layerListAdapter = new LayerListAdapter(this, layers);
+        layerListAdapter = new LayerListAdapter(this, layers);
 
         ListView lv = (ListView) findViewById(R.id.layers_list_view);
         if (lv != null) {
             lv.setAdapter(layerListAdapter);
             lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         }
+
+        ImageButton addButtonView = (ImageButton) findViewById(R.id.addNewLayer);
+        addButtonView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DB db=DB.getInstance(getApplicationContext());
+                db.open();
+                float[] randomHsv= {(float) (360*Math.random()),1,1};
+                MyLayer newLayer = new MyLayer(0, "My layer", 0, Color.HSVToColor(randomHsv), true, getApplicationContext());
+                db.saveLayer(newLayer);
+                layers.add(newLayer);
+                layerListAdapter.notifyDataSetChanged();
+                db.close();
+            }
+        });
     }
 
     private class LayerListAdapter extends ArrayAdapter<MyLayer> {
@@ -96,7 +114,6 @@ public class LayersActivity extends AppCompatActivity {
                     }
                 }
             });
-
             return rowView;
         }
 
