@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Мои POI</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="description">Описание</string>
+    <string name="label">Метка</string>
+    <string name="latitude">Шир:</string>
+    <string name="longitude">Дол:</string>
+    <string name="layer">Слой:</string>
+    <string name="title_activity_layers">Слои</string>
+    <string name="save">Сохранить</string>
+</resources>

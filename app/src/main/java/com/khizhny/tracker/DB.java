@@ -62,7 +62,7 @@ public class DB extends SQLiteOpenHelper {
         Log.d(TAG,"Start filling DB with test data...");
         for (int j=0; j<3; j++) {
             float[] randomHsv= {(float) (360*Math.random()),1,1};
-            MyLayer layer = new MyLayer(0, "test_layer_"+j, j, Color.HSVToColor(randomHsv), true, ctx);
+            MyLayer layer = new MyLayer(0, "layer_"+j, j, Color.HSVToColor(randomHsv), true, ctx);
             double lat,lon;
             for (int i = 1; i < 100; i++) {
                 lat = 46 + 6 * Math.random();

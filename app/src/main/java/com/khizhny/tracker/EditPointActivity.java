@@ -99,11 +99,19 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
         }
 
         if (latView != null) {
-            latView.setText(point.getLatitude(true));
+            if(useGmsFormat) {
+                latView.setText(point.getLatitude(true));
+            } else {
+                latView.setText(point.getLatitude(false));
+            }
             latView.setOnClickListener(this);
         }
         if (lonView != null) {
-            lonView.setText(point.getLongitude(true));
+            if(useGmsFormat) {
+                lonView.setText(point.getLongitude(true));
+            }else {
+                lonView.setText(point.getLongitude(false));
+            }
             lonView.setOnClickListener(this);
         }
 

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/layers"
+        android:text="@string/title_activity_layers"
         android:id="@+id/textView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Мої РОІ</string>
+    <string name="cancel">Відміна</string>
+    <string name="delete">Видалити</string>
+    <string name="description">Опис</string>
+    <string name="label">Мітка</string>
+    <string name="latitude">Шир:</string>
+    <string name="longitude">Дов:</string>
+    <string name="layer">Шар:</string>
+    <string name="title_activity_layers">Шари</string>
+    <string name="save">Зберігти</string>
+</resources>

@@ -51,9 +51,9 @@
             android:text="@string/latitude"
             android:id="@+id/textView2"
             android:layout_toRightOf="@+id/new_point_icon"
-            android:layout_alignRight="@+id/textView3"
-            android:layout_alignEnd="@+id/textView3"
-            android:gravity="right"/>
+            android:gravity="right"
+            android:singleLine="true"
+            />
 
         <TextView
             android:layout_width="wrap_content"
@@ -63,7 +63,8 @@
             android:id="@+id/textView3"
             android:layout_toRightOf="@+id/new_point_icon"
             android:layout_toEndOf="@+id/new_point_icon"
-            android:layout_below="@+id/textView2"/>
+            android:layout_below="@+id/textView2"
+            android:singleLine="true"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -83,7 +84,6 @@
             android:text="@string/longitude"
             android:id="@+id/new_point_lon"
             android:layout_below="@+id/textView2"
-            android:layout_above="@+id/new_point_layer"
             android:layout_toLeftOf="@+id/new_point_delete"
             android:layout_toRightOf="@+id/textView3"
             android:layout_toEndOf="@+id/textView3"/>
