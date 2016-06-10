@@ -10,7 +10,6 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import static com.khizhny.tracker.MainActivity.TAG;
-import static com.khizhny.tracker.MyLayer.markerIcons;
 
 import java.util.ArrayList;
 
@@ -39,7 +38,7 @@ public class DB extends SQLiteOpenHelper {
         database=getWritableDatabase();
     }
 
-    public void addOrEditPoint(MyLayer layer, MyItem point){
+    public void addOrEditPoint(MyLayer layer, MyPoint point){
         ContentValues cv = new ContentValues();
         cv.put("lat",point.getPosition().latitude);
         cv.put("lon",point.getPosition().longitude);
@@ -67,7 +66,7 @@ public class DB extends SQLiteOpenHelper {
             for (int i = 1; i < 100; i++) {
                 lat = 46 + 6 * Math.random();
                 lon = 27 + 13 * Math.random();
-                layer.points.add(new MyItem(new LatLng(lat, lon), "Sample point.", "Layer #"+j+" Point #" + i, layer,0));
+                layer.points.add(new MyPoint(new LatLng(lat, lon), "Sample point.", "Layer #"+j+" Point #" + i, layer,0));
             }
             saveLayer(layer);
         }
@@ -126,7 +125,7 @@ public class DB extends SQLiteOpenHelper {
                 c.close();
                 layer.setId(layerId);
                 // saving all points on the layer to db
-                for (MyItem point: layer.points) {
+                for (MyPoint point: layer.points) {
                     addOrEditPoint(layer,point);
                 }
                 database.setTransactionSuccessful();
@@ -179,20 +178,20 @@ public class DB extends SQLiteOpenHelper {
      * @param bounds - Geographical filter. If null - no filtering.
      * @return List of points
      */
-    public ArrayList<MyItem> getPoints(MyLayer layer, LatLngBounds bounds){
+    public ArrayList<MyPoint> getPoints(MyLayer layer, LatLngBounds bounds){
         Log.d(TAG,"Start reading points for bounds "+bounds);
         Cursor c = database.rawQuery("SELECT lat, lon, description, label, _id FROM points WHERE layer_id="+layer.getId()+" AND rowid<="+MAX_POINTS_LIMIT, null);
         // looping through all rows and adding to list
-        ArrayList<MyItem> points = new ArrayList<>();
+        ArrayList<MyPoint> points = new ArrayList<>();
         LatLng point;
         if (c.moveToFirst()) {
             do {
                 point = new LatLng(c.getDouble(0), c.getDouble(1));
                 if (bounds==null){
-                    points.add(new MyItem(point, c.getString(2), c.getString(3), layer,c.getInt(4)));
+                    points.add(new MyPoint(point, c.getString(2), c.getString(3), layer,c.getInt(4)));
                 } else {
                     if (bounds.contains(point)) {
-                        points.add(new MyItem(point, c.getString(2), c.getString(3),layer,c.getInt(4)));
+                        points.add(new MyPoint(point, c.getString(2), c.getString(3),layer,c.getInt(4)));
                     }
                 }
             } while (c.moveToNext());
@@ -205,13 +204,13 @@ public class DB extends SQLiteOpenHelper {
     /**
      * Gets a single point from DB for editing. No layer object. Just layer Id.
      * @param id Point ID.
-     * @return MyItem Object
+     * @return MyPoint Object
      */
-    public MyItem getPoint(int id){
+    public MyPoint getPoint(int id){
         Cursor c = database.rawQuery("SELECT lat, lon, description, label, layer_id FROM points WHERE _id="+id, null);
-        MyItem rez=null;
+        MyPoint rez=null;
         if (c.moveToFirst()) {
-           rez=new MyItem(new LatLng(c.getDouble(0), c.getDouble(1)), c.getString(2), c.getString(3), c.getInt(4),id);
+           rez=new MyPoint(new LatLng(c.getDouble(0), c.getDouble(1)), c.getString(2), c.getString(3), c.getInt(4),id);
         c.close();
         }
         return rez;

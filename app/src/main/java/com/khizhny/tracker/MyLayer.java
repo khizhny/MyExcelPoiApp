@@ -10,16 +10,13 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import static com.khizhny.tracker.MainActivity.TAG;
 import java.util.ArrayList;
-/*cxv
-* */
-
 
 public class MyLayer {
     private int id;
     private String name;
     private int iconId;
     private int color;
-    public ArrayList<MyItem> points;
+    public ArrayList<MyPoint> points;
     public boolean visible;
     private BitmapDescriptor layerIcon;
     private Drawable drawableIcon;

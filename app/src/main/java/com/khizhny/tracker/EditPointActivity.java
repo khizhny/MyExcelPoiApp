@@ -13,7 +13,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -23,7 +22,7 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
 
     private ArrayList<MyLayer> layers;
     private Spinner layerSpinner;
-    private MyItem point;
+    private MyPoint point;
     private TextView latView;
     private TextView lonView;
     private Boolean useGmsFormat;
@@ -95,7 +94,7 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
         } else { // or creating a new point object
             Double lat = getIntent().getDoubleExtra("lat",0);
             Double lon = getIntent().getDoubleExtra("lon",0);
-            point = new MyItem(new LatLng(lat,lon),"","",null,0);
+            point = new MyPoint(new LatLng(lat,lon),"","",null,0);
         }
 
         if (latView != null) {
@@ -152,7 +151,7 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
                 layer = (MyLayer) layerSpinner.getSelectedItem();
                 comment = ((EditText)findViewById(R.id.new_point_description)).getText().toString();
                 label = ((EditText)findViewById(R.id.new_point_label)).getText().toString();
-                MyItem new_point = new MyItem(point.getPosition(),comment,label,layer,0);
+                MyPoint new_point = new MyPoint(point.getPosition(),comment,label,layer,0);
                 db = DB.getInstance(getApplicationContext());
                 db.open();
                 db.deletePoint(point.getId());
@@ -175,7 +174,7 @@ public class EditPointActivity extends AppCompatActivity implements View.OnClick
             case R.id.new_point_lon:
                 useGmsFormat=!useGmsFormat;
                 latView.setText(point.getLatitude(useGmsFormat));
-                lonView.setText(point.getLatitude(useGmsFormat));
+                lonView.setText(point.getLongitude(useGmsFormat));
                 SharedPreferences.Editor spe = getApplication().getSharedPreferences("settings",0).edit();
                 spe.putBoolean("useGmsFormat",useGmsFormat);
                 spe.commit();

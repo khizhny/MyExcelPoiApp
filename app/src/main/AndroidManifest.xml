@@ -45,9 +45,12 @@
             android:label="@string/title_activity_layers"
             android:theme="@style/AppTheme">
         </activity>
-        <activity android:name=".EditLayerActivity">
+        <activity
+            android:name=".EditLayerActivity">
         </activity>
-        <activity android:name=".EditPointActivity" android:theme="@style/Theme.Transparent">
+        <activity
+            android:name=".EditPointActivity"
+            android:theme="@style/Theme.Transparent">
         </activity>
     </application>
 

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 
+import jxl.NumberCell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -49,11 +50,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     ClusterManager.OnClusterItemClickListener,
     GoogleMap.OnCameraChangeListener,
     ClusterManager.OnClusterClickListener {
-    public static String TAG = "MyTracker";
+    public static String TAG = "MyPOI";
     private static final String FILE_NAME = "MyPoints.xls";
-    private static final String EXPORT_FOLDER = "tracker";
+    private static final String EXPORT_FOLDER = "MyPOI";
     private GoogleMap map;
-    private ClusterManager<MyItem> clusterManager;
+    private ClusterManager<MyPoint> clusterManager;
     private ArrayList<MyLayer> layers;
     private int mapMode=1;
     private MyClusterRenderer myClusterRenderer;
@@ -62,7 +63,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public static boolean isRefreshNeeded=false; // flag for manual map refresh
 
 
-    private class MyClusterRenderer extends DefaultClusterRenderer<MyItem> {
+    private class MyClusterRenderer extends DefaultClusterRenderer<MyPoint> {
 
         private IconGenerator mIconGenerator;
 
@@ -72,7 +73,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(MyItem myItem, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(MyPoint myItem, MarkerOptions markerOptions) {
             // Draw a single marker.
             //BitmapDescriptor ico;
             //ico = BitmapDescriptorFactory.fromI
@@ -83,7 +84,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<MyItem> cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterRendered(Cluster<MyPoint> cluster, MarkerOptions markerOptions) {
             /*super.onBeforeClusterRendered(cluster, markerOptions);
             markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.locations));
             markerOptions.title(""+cluster.getItems().size());*/
@@ -215,7 +216,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         clusterManager.clearItems();
         for (MyLayer layer : layers) {
             if (layer.visible) {
-                for (MyItem point : layer.points) {
+                for (MyPoint point : layer.points) {
                     clusterManager.addItem(point);
                 }
             }
@@ -226,11 +227,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onClusterItemClick(ClusterItem clusterItem) {
         /*new AlertDialog.Builder(this)
-                .setTitle(((MyItem)clusterItem).getLabel())
-                .setMessage(((MyItem)clusterItem).getComment())
+                .setTitle(((MyPoint)clusterItem).getLabel())
+                .setMessage(((MyPoint)clusterItem).getComment())
                 .show();*/
         Intent intent = new Intent(getApplicationContext(),EditPointActivity.class);
-        intent.putExtra("point_id",((MyItem) clusterItem).getId());
+        intent.putExtra("point_id",((MyPoint) clusterItem).getId());
         startActivity(intent);
         return true;
     }
@@ -246,7 +247,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 msg=msg+"...";
                 break;
             }
-            msg=msg+separator+((MyItem) itr.next()).getLabel();
+            msg=msg+separator+((MyPoint) itr.next()).getLabel();
             separator = ", ";
             i=i+1;
         }
@@ -331,7 +332,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     layerSheet.addCell(new Label(1, j, l.getName()));
                     layerSheet.addCell(new Label(2, j, l.getIconId() + ""));
                     layerSheet.addCell(new Label(3, j, l.getColor() + ""));
-                    for (MyItem p : l.points) {
+                    for (MyPoint p : l.points) {
                         i = i + 1;
                         pointsSheet.addCell(new Label(0, i, "" + i));
                         pointsSheet.addCell(new Label(1, i, p.getLabel()));
@@ -365,7 +366,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void importFromExcel() {        //Saving file in external storage
         File sdCard = Environment.getExternalStorageDirectory();
         File directory = new File(sdCard.getAbsolutePath() + "/" + EXPORT_FOLDER);
-
         //create directory if not exist
         if (!directory.isDirectory()) {
             directory.mkdirs();
@@ -392,10 +392,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             int pointLayerId = Integer.parseInt(pointsSheet.getCell(5, i).getContents());
                             if (pointLayerId == layerId) {
                                 String label = pointsSheet.getCell(1, i).getContents();
-                                double lon = Double.parseDouble(pointsSheet.getCell(2, i).getContents().replace(",", "."));
-                                double lat = Double.parseDouble(pointsSheet.getCell(3, i).getContents().replace(",", "."));
+                                double lon = ((NumberCell) pointsSheet.getCell(2, i)).getValue();
+                                double lat = ((NumberCell) pointsSheet.getCell(3, i)).getValue();
                                 String comment = pointsSheet.getCell(4, i).getContents();
-                                new_layer.points.add(new MyItem(new LatLng(lat, lon), comment, label,new_layer,0));
+                                new_layer.points.add(new MyPoint(new LatLng(lat, lon), comment, label,new_layer,0));
                             }
                         }
                         DB db = DB.getInstance(this);

@@ -9,7 +9,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class MyItem implements ClusterItem {
+public class MyPoint implements ClusterItem {
     private final LatLng position;
     private final String comment;
     private final String label;
@@ -26,7 +26,7 @@ public class MyItem implements ClusterItem {
      * @param layer -layer object
      * @param pointId - point db id. 0 for unsaved point.
      */
-    public MyItem(LatLng point, String comment, String label, MyLayer layer, int pointId) {
+    public MyPoint(LatLng point, String comment, String label, MyLayer layer, int pointId) {
         this.position = point;
         this.comment=comment;
         this.label=label;
@@ -47,7 +47,7 @@ public class MyItem implements ClusterItem {
      * @param layerId -layer db id
      * @param pointId - point db id. 0 for unsaved point.
      */
-    public MyItem(LatLng point, String comment, String label, int layerId, int pointId) {
+    public MyPoint(LatLng point, String comment, String label, int layerId, int pointId) {
         this.position = point;
         this.comment=comment;
         this.label=label;
