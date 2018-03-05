@@ -1,12 +1,16 @@
 package com.khizhny.tracker;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 
+import jxl.Cell;
 import jxl.NumberCell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -45,12 +50,12 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback,
-    ClusterManager.OnClusterItemClickListener,
+				ClusterManager.OnClusterItemClickListener,
     GoogleMap.OnCameraChangeListener,
     ClusterManager.OnClusterClickListener {
-    public static String TAG = "MyPOI";
+		public static String TAG = "MyPOI";
     private static final String FILE_NAME = "MyPoints.xls";
     private static final String EXPORT_FOLDER = "MyPOI";
     private GoogleMap map;
@@ -62,10 +67,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private float prevZoomLevel;
     public static boolean isRefreshNeeded=false; // flag for manual map refresh
 
+		private static final int REQUEST_CODE_ASK_PERMISSIONS=9000; // Read SD card
+
+		@Override
+		public boolean onCreateOptionsMenu(Menu menu) {
+				// Inflate the menu; this adds items to the action bar if it is present.
+				getMenuInflater().inflate(R.menu.menu_main, menu);
+				return true;
+		}
 
     private class MyClusterRenderer extends DefaultClusterRenderer<MyPoint> {
 
+
+
         private IconGenerator mIconGenerator;
+
+
 
         public MyClusterRenderer() {
             super(getApplicationContext(), map, clusterManager);
@@ -93,6 +110,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(mIconGenerator.makeIcon(cluster.getSize()+"")));
         }
     }
+
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
@@ -126,7 +144,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ImageButton mapModeButton = (ImageButton) findViewById(R.id.map_mode);
+        ImageButton mapModeButton = findViewById(R.id.map_mode);
         mapModeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,12 +168,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.setHasOptionsMenu(true);
         layers = new ArrayList<>();
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -255,11 +267,73 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+		private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener, DialogInterface.OnClickListener cancelListener) {
+				new AlertDialog.Builder(this)
+								.setMessage(message)
+								.setPositiveButton("OK", okListener)
+								.setNegativeButton("Cancel", cancelListener)
+								.create()
+								.show();
+		}
+
+		public  boolean isStoragePermissionGranted() {
+				if (Build.VERSION.SDK_INT >= 23) {
+						if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+										== PackageManager.PERMISSION_GRANTED) {
+								Log.v(TAG,"Permission is granted");
+								return true;
+						} else {
+								Log.v(TAG,"Permission is revoked");
+								//ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+								return false;
+						}
+				}
+				else { //permission is automatically granted on sdk<23 upon installation
+						Log.v(TAG,"Permission is granted");
+						return true;
+				}
+		}
+
+		private void requestSdWritePermissions() {
+				// requsting SD card access permissions
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+						boolean hasWritePermission=PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+						if (!hasWritePermission) {
+								if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+										showMessageOKCancel("System needs you permission to read SD card.",
+														new DialogInterface.OnClickListener() {
+																@Override
+																public void onClick(DialogInterface dialog, int which) {
+																		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+																				requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
+																		}
+																}
+														},null);
+										return;
+								}
+								requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
+						}
+				}
+		}
+
+		@Override
+		public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+				super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+				if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+						Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
+						exportToExcel();
+				}
+		}
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_export:
-                exportToExcel();
+								if (isStoragePermissionGranted()){
+										exportToExcel();
+								} else {
+										requestSdWritePermissions();
+								}
                 break;
             case R.id.menu_item_import:
                 importFromExcel();
@@ -374,6 +448,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //file path
         File file = new File(directory, FILE_NAME);
         Workbook workbook;
+				Cell cLon;
+				Cell cLat;
         try {
             workbook = Workbook.getWorkbook(file);
             Sheet pointsSheet = workbook.getSheet(0); // "MyPoints"
@@ -392,10 +468,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             int pointLayerId = Integer.parseInt(pointsSheet.getCell(5, i).getContents());
                             if (pointLayerId == layerId) {
                                 String label = pointsSheet.getCell(1, i).getContents();
-                                double lon = ((NumberCell) pointsSheet.getCell(2, i)).getValue();
-                                double lat = ((NumberCell) pointsSheet.getCell(3, i)).getValue();
-                                String comment = pointsSheet.getCell(4, i).getContents();
-                                new_layer.points.add(new MyPoint(new LatLng(lat, lon), comment, label,new_layer,0));
+                                cLon= pointsSheet.getCell(2, i);
+                                cLat= pointsSheet.getCell(3, i);
+																if ((cLon instanceof NumberCell) && (cLat instanceof NumberCell)){
+																		double lon = ((NumberCell) cLon).getValue();
+																		double lat = ((NumberCell) cLat).getValue();
+																		String comment = pointsSheet.getCell(4, i).getContents();
+																		new_layer.points.add(new MyPoint(new LatLng(lat, lon), comment, label,new_layer,0));
+																}else{
+																		String sLon=cLon.getContents();
+																		String sLat=cLat.getContents();
+																		double lon =  Double.parseDouble(sLon.replace(",","."));
+																		double lat = Double.parseDouble(sLat.replace(",","."));
+																		String comment = pointsSheet.getCell(4, i).getContents();
+																		new_layer.points.add(new MyPoint(new LatLng(lat, lon), comment, label,new_layer,0));
+																}
                             }
                         }
                         DB db = DB.getInstance(this);

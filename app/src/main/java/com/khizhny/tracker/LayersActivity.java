@@ -20,7 +20,7 @@ import static com.khizhny.tracker.MainActivity.TAG;
 
 import java.util.List;
 
-public class LayersActivity extends AppCompatActivity {
+public class LayersActivity extends AppCompatActivity implements View.OnClickListener {
     private List<MyLayer> layers;
     private boolean changedByUser;
     private LayerListAdapter layerListAdapter;
@@ -46,23 +46,21 @@ public class LayersActivity extends AppCompatActivity {
             lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         }
 
-        ImageButton addButtonView = (ImageButton) findViewById(R.id.addNewLayer);
-        addButtonView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DB db=DB.getInstance(getApplicationContext());
-                db.open();
-                float[] randomHsv= {(float) (360*Math.random()),1,1};
-                MyLayer newLayer = new MyLayer(0, "My layer", 0, Color.HSVToColor(randomHsv), true, getApplicationContext());
-                db.saveLayer(newLayer);
-                layers.add(newLayer);
-                layerListAdapter.notifyDataSetChanged();
-                db.close();
-            }
-        });
     }
 
-    private class LayerListAdapter extends ArrayAdapter<MyLayer> {
+		@Override
+		public void onClick(View v) {
+				DB db=DB.getInstance(getApplicationContext());
+				db.open();
+				float[] randomHsv= {(float) (360*Math.random()),1,1};
+				MyLayer newLayer = new MyLayer(0, "My layer", 0, Color.HSVToColor(randomHsv), true, getApplicationContext());
+				db.saveLayer(newLayer);
+				layers.add(newLayer);
+				layerListAdapter.notifyDataSetChanged();
+				db.close();
+		}
+
+		private class LayerListAdapter extends ArrayAdapter<MyLayer> {
 
         public LayerListAdapter(Context context, List<MyLayer> layers) {
             super(context, R.layout.activity_list_layers_row, layers);

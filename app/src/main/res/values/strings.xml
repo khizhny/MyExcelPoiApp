@@ -12,4 +12,8 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="coordinate" translatable="false">99.99999</string>
+    <string name="layers">layers</string>
+    <string name="import_from_excel">Import from Excel</string>
+    <string name="export_to_excel">Export to Excel</string>
+    <string name="quit">Quit</string>
 </resources>

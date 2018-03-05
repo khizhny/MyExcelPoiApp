@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_item_export"
+        android:title="@string/export_to_excel"
+        android:orderInCategory="96"
+        android:icon="@drawable/ic_export"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/menu_item_import"
+        android:title="@string/import_from_excel"
+        android:orderInCategory="97"
+        android:icon="@drawable/ic_import"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/menu_item_quit"
+        android:title="@string/quit"
+        android:orderInCategory="98"
+        android:icon="@drawable/ic_exit"
+        app:showAsAction="ifRoom"
+        />
+
+
+</menu>
